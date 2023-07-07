@@ -4,8 +4,9 @@ export function queBuiMongo(param: {
       relations?: [{
           name: string,
           alias?: string
-          relation?: []
-      }]
+          relation?: [],
+      }],
+      filter?: {},
   }
 }) {
   let resp:any[] = [];
@@ -19,6 +20,32 @@ export function queBuiMongo(param: {
           
         }
       });
+  }
+
+  if(req?.filter) {
+
+    Object.keys(req.filter).forEach(k=>{
+      if(k[0] != '$') {
+        const regex: any = new RegExp(
+          '.*' + req.filter[k] + '.*',
+          'i',
+        );
+        req.filter[k] = {
+          "$regex": regex
+        }
+      }
+    });
+
+    resp = [
+      ...resp, 
+      {
+        $match: {
+          $and: [ 
+            req.filter
+          ],
+        }
+      },
+    ]
   }
 
   return resp;

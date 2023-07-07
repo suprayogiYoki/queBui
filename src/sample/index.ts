@@ -1,12 +1,15 @@
 import { queBuiMongo } from "../queBuiMongo";
 import scheme from "./scheme";
 
-console.log('test',
+console.log('test', JSON.stringify(
   queBuiMongo({
     schema: scheme,
     req: {
       name: 'users',
-      relations: [{name: 'client'}]
+      relations: [{name: 'client'}],
+      filter: {
+        "client.name": "o"
+      }
     }
-  })
+  }))
 );
