@@ -1,7 +1,7 @@
 import { queBuiMongo } from "../queBuiMongo";
 import scheme from "./scheme";
 
-console.log(
+console.log('test',
   queBuiMongo({
     schema: scheme,
     req: {
