@@ -15,32 +15,38 @@ function convertLike(value: string) {
 
 function convertAndOr(filterValue) {
   for (let orAnd of filterValue) {
-    for (const search in orAnd) {
-      if (search != '$') {
-        orAnd[search] = convertLike(orAnd[search])
-      }
-      else if (['$and', '$or'].indexOf(search) != -1) {
-        convertAndOr(filterValue)
-      }
-    }
+    convertFilter(orAnd)
+    // for (const search in orAnd) {
+    //   if (search != '$') {
+    //     orAnd[search] = convertLike(orAnd[search])
+    //   }
+    //   else if (['$and', '$or'].indexOf(search) != -1) {
+    //     convertAndOr(filterValue)
+    //   }
+    // }
   }
 }
 
 function convertFilter(filter: mongoSchema['filter']) {
   Object.keys(filter).forEach(k => {
     let filterValue = filter[k]
-    if (filter[k] == false) {
-      filterValue = '{$in: [null, false]}'
-    }
-    else if (filter[k] == true) {
-      filterValue = true
-    }
-    else if (k[0] != '$') {
-      filterValue = convertLike(filterValue)
+    if (k[0] != '$') {
+      if (filter[k] == false) {
+        filterValue = '{$in: [null, false]}'
+      }
+      else if (filter[k] == true) {
+        filterValue = true
+      }
+      else {
+        console.log('3', k, filterValue)
+        filterValue = convertLike(filterValue)
+        console.log('3', k, filterValue)
+      }
     }
     else if (['$and', '$or'].indexOf(k) != -1) {
       convertAndOr(filterValue)
     }
+    filter[k] = filterValue;
   });
 }
 
@@ -72,6 +78,8 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
       },
     ]
   }
+
+  console.log('\n\n',JSON.stringify(resp));
 
   return resp;
 }
