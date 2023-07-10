@@ -44,15 +44,16 @@ function convertRelation(schema, parentName: string, relation: mongoSchema['rela
   let relations = []
   relation.forEach(rel => {
     try {
-      const currentRel: [] = schema[parentName].relations[rel.name]
+      let currentRel: any[] = schema[parentName].relations[rel.name]
       if (rel.relations) {
-        currentRel.map(((rel2:any)=>{
+        currentRel = currentRel.map(((rel2:any)=>{
+          rel2 = JSON.parse(JSON.stringify(rel2));
           if (Object.keys(rel2)[0] == '$lookup') {
             rel2['$lookup']['pipeline'] = [];
-            const parent = rel2[Object.keys(rel2)[0]];
+            console.log('1) add pipeline')
             rel2['$lookup']['pipeline'] = [ 
               ...rel2['$lookup']['pipeline'], 
-              ...convertRelation(schema, rel2['$lookup']['from'], rel.relations)
+              ...convertRelation(schema, rel2['$lookup']['from'], Object.create(rel.relations))
             ]
           }
           return rel2;
@@ -73,9 +74,24 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
     resp = [...resp, ...convertRelation(schema, req.name, req?.relations)]
   }
 
+  console.log(JSON.stringify(resp)
+    // 'get pipeline ke 11',
+    // resp[0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+    // [0]['$lookup']['pipeline']
+  );
 
   if (req?.filter) {
     convertFilter(req.filter)
+    
 
     resp = [
       ...resp,
