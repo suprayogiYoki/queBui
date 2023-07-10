@@ -32,7 +32,7 @@ function convertFilter(filter: mongoSchema['filter']) {
     let filterValue = filter[k]
     if (k[0] != '$') {
       if (filter[k] == false) {
-        filterValue = '{$in: [null, false]}'
+        filterValue = {$in: [null, false]}
       }
       else if (filter[k] == true) {
         filterValue = true
