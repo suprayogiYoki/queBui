@@ -74,21 +74,6 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
     resp = [...resp, ...convertRelation(schema, req.name, req?.relations)]
   }
 
-  console.log(JSON.stringify(resp)
-    // 'get pipeline ke 11',
-    // resp[0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-    // [0]['$lookup']['pipeline']
-  );
-
   if (req?.filter) {
     convertFilter(req.filter)
     
