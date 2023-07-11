@@ -2,6 +2,9 @@ interface mongoSchema {
   name: string,
   relations?: [mongoSchema],
   filter?: {},
+  sort?: {
+    [k:string]: string
+  }
 }
 
 function convertLike(value: string) {
@@ -46,13 +49,13 @@ function convertRelation(schema, parentName: string, relation: mongoSchema['rela
     try {
       let currentRel: any[] = schema[parentName].relations[rel.name]
       if (rel.relations) {
-        currentRel = currentRel.map(((rel2:any)=>{
+        currentRel = currentRel.map(((rel2: any) => {
           rel2 = JSON.parse(JSON.stringify(rel2));
           if (Object.keys(rel2)[0] == '$lookup') {
             rel2['$lookup']['pipeline'] = [];
-            console.log('1) add pipeline')
-            rel2['$lookup']['pipeline'] = [ 
-              ...rel2['$lookup']['pipeline'], 
+            // console.log('1) add pipeline')
+            rel2['$lookup']['pipeline'] = [
+              ...rel2['$lookup']['pipeline'],
               ...convertRelation(schema, rel2['$lookup']['from'], Object.create(rel.relations))
             ]
           }
@@ -76,7 +79,6 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
 
   if (req?.filter) {
     convertFilter(req.filter)
-    
 
     resp = [
       ...resp,
@@ -88,6 +90,24 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
         }
       },
     ]
+  }
+
+  if (req?.sort) {
+    try {
+      const sort:{[k:string]:number} = {}
+      for (const key in req?.sort) {
+        if(req?.sort[key] == 'asc') {
+          sort[key] = 1
+        }
+        else {
+          sort[key] = -1
+        }
+      }
+      resp = [
+        ...resp,
+        { "$sort" : sort }
+      ]
+    } catch (error) {}
   }
 
   return resp;

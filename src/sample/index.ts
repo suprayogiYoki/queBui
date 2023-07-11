@@ -14,8 +14,11 @@ console.log('test',
         ],
         "filter": {
           "name": "o"
+        },
+        "sort": {
+          "name": "desc"
         }
       }
-    })[2]
+    })
   )
 );
