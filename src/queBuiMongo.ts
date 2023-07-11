@@ -3,8 +3,10 @@ interface mongoSchema {
   relations?: [mongoSchema],
   filter?: {},
   sort?: {
-    [k:string]: string
+    [k: string]: string
   }
+  page?: number,
+  perpage?:number
 }
 
 function convertLike(value: string) {
@@ -69,6 +71,16 @@ function convertRelation(schema, parentName: string, relation: mongoSchema['rela
   return relations
 }
 
+function convertPaginated(page: number, perpage: number = 20): [
+  { $skip: number },
+  { $limit: number }
+] {
+  return [
+    { $skip: (page - 1) * perpage },
+    { $limit: perpage },
+  ]
+}
+
 export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
   let resp: any[] = [];
   const { schema, req } = param;
@@ -94,9 +106,9 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
 
   if (req?.sort) {
     try {
-      const sort:{[k:string]:number} = {}
+      const sort: { [k: string]: number } = {}
       for (const key in req?.sort) {
-        if(req?.sort[key] == 'asc') {
+        if (req?.sort[key] == 'asc') {
           sort[key] = 1
         }
         else {
@@ -105,9 +117,13 @@ export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
       }
       resp = [
         ...resp,
-        { "$sort" : sort }
+        { "$sort": sort }
       ]
-    } catch (error) {}
+    } catch (error) { }
+  }
+
+  if(req?.page){
+    resp = [...resp, ...convertPaginated(req?.page, req?.perpage)]
   }
 
   return resp;
