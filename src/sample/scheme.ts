@@ -10,7 +10,8 @@ export default {
             as: 'client'
           }
         },
-        { $unwind: '$client' },]
+        { $unwind: '$client' },
+      ],
     }
-  }
+  },
 }

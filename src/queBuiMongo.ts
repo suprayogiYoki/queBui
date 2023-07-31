@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 interface mongoSchema {
   name: string,
   relations?: [mongoSchema],
@@ -28,7 +30,14 @@ function convertFilter(filter: mongoSchema['filter']) {
   Object.keys(filter).forEach(k => {
     let filterValue = filter[k]
     if (k[0] != '$') {
-      if (filter[k] == false) {
+      // 64afa418340e5e6555da6754
+      console.log(k, typeof filterValue, );
+      if(typeof filterValue === 'object') {
+        if(Object.keys(filterValue)[0] == '$id') {
+          filterValue = new ObjectId(filterValue['$id']);
+        }
+      }
+      else if (filter[k] == false) {
         filterValue = { $in: [null, false] }
       }
       else if (filter[k] == true) {
