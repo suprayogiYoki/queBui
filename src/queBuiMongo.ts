@@ -1,15 +1,5 @@
 import { ObjectId } from "mongodb";
-
-interface mongoSchema {
-  name: string,
-  relations?: [mongoSchema],
-  filter?: {},
-  sort?: {
-    [k: string]: string
-  }
-  page?: number,
-  perpage?:number
-}
+import { QuerySchema } from "./contract";
 
 function convertLike(value: string) {
   const regex: any = new RegExp(
@@ -26,7 +16,7 @@ function convertAndOr(filterValue) {
   }
 }
 
-function convertFilter(filter: mongoSchema['filter']) {
+function convertFilter(filter: QuerySchema['filter']) {
   Object.keys(filter).forEach(k => {
     let filterValue = filter[k]
     if (k[0] != '$') {
@@ -54,7 +44,7 @@ function convertFilter(filter: mongoSchema['filter']) {
   });
 }
 
-function convertRelation(schema, parentName: string, relation: mongoSchema['relations']) {
+function convertRelation(schema, parentName: string, relation: QuerySchema['relations']) {
   let relations = []
   relation.forEach(rel => {
     try {
@@ -90,7 +80,7 @@ function convertPaginated(page: number, perpage: number = 20): [
   ]
 }
 
-export function queBuiMongo(param: { schema: any, req: mongoSchema }) {
+export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
   let resp: any[] = [];
   const { schema, req } = param;
 
