@@ -20,11 +20,23 @@ function convertFilter(filter: QuerySchema['filter']) {
   Object.keys(filter).forEach(k => {
     let filterValue = filter[k]
     if (k[0] != '$') {
-      // 64afa418340e5e6555da6754
-      console.log(k, typeof filterValue, );
-      if(typeof filterValue === 'object') {
-        if(Object.keys(filterValue)[0] == '$id') {
-          filterValue = new ObjectId(filterValue['$id']);
+      if (typeof filterValue === 'object') {
+        const queryKey = Object.keys(filterValue)[0];
+        switch (queryKey) {
+          case '$id':
+            filterValue = new ObjectId(filterValue[queryKey]);
+            break;
+          case '$eq':
+            filterValue =  {
+              "$regex": new RegExp(
+                '^' + filterValue[queryKey] + '$',
+                'i',
+              )
+            };
+            break;
+
+          default:
+            break;
         }
       }
       else if (filter[k] == false) {
@@ -121,7 +133,7 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
     } catch (error) { }
   }
 
-  if(req?.page){
+  if (req?.page) {
     resp = [...resp, ...convertPaginated(req?.page, req?.perpage)]
   }
 
