@@ -19,6 +19,7 @@ function convertAndOr(filterValue) {
 function convertFilter(filter: QuerySchema['filter']) {
   Object.keys(filter).forEach(k => {
     let filterValue = filter[k]
+
     if (k[0] != '$') {
       if (typeof filterValue === 'object') {
         const queryKey = Object.keys(filterValue)[0];
@@ -27,6 +28,8 @@ function convertFilter(filter: QuerySchema['filter']) {
             filterValue = new ObjectId(filterValue[queryKey]);
             break;
           case '$eq':
+            console.log(typeof filterValue[queryKey], filterValue[queryKey])
+            if(typeof filterValue[queryKey] == 'string')
             filterValue =  {
               "$regex": new RegExp(
                 '^' + filterValue[queryKey] + '$',
@@ -66,7 +69,6 @@ function convertRelation(schema, parentName: string, relation: QuerySchema['rela
           rel2 = JSON.parse(JSON.stringify(rel2));
           if (Object.keys(rel2)[0] == '$lookup') {
             rel2['$lookup']['pipeline'] = [];
-            // console.log('1) add pipeline')
             rel2['$lookup']['pipeline'] = [
               ...rel2['$lookup']['pipeline'],
               ...convertRelation(schema, rel2['$lookup']['from'], Object.create(rel.relations))
@@ -96,11 +98,13 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
   let resp: any[] = [];
   const { schema, req } = param;
 
+
   if (req?.relations) {
     resp = [...resp, ...convertRelation(schema, req.name, req?.relations)]
   }
 
   if (req?.filter) {
+
     convertFilter(req.filter)
 
     resp = [
@@ -136,6 +140,8 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
   if (req?.page) {
     resp = [...resp, ...convertPaginated(req?.page, req?.perpage)]
   }
+
+  console.log(JSON.stringify(req.filter))
 
   return resp;
 }
