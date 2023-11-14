@@ -28,7 +28,6 @@ function convertFilter(filter: QuerySchema['filter']) {
             filterValue = new ObjectId(filterValue[queryKey]);
             break;
           case '$eq':
-            console.log(typeof filterValue[queryKey], filterValue[queryKey])
             if(typeof filterValue[queryKey] == 'string')
             filterValue =  {
               "$regex": new RegExp(
@@ -36,6 +35,9 @@ function convertFilter(filter: QuerySchema['filter']) {
                 'i',
               )
             };
+            break;
+          case '$inId':
+            filterValue = {'$in': filterValue[queryKey].map(v=>new ObjectId(v))}
             break;
 
           default:
@@ -137,11 +139,11 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
     } catch (error) { }
   }
 
+  console.log(JSON.stringify(req.filter))
+
   if (req?.page) {
     resp = [...resp, ...convertPaginated(req?.page, req?.perpage)]
   }
-
-  console.log(JSON.stringify(req.filter))
 
   return resp;
 }
