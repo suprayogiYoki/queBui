@@ -139,7 +139,7 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
     } catch (error) { }
   }
 
-  console.log(JSON.stringify(req.filter))
+  // console.log(JSON.stringify(req.filter))
 
   if (req?.page) {
     resp = [...resp, ...convertPaginated(req?.page, req?.perpage)]
