@@ -28,16 +28,13 @@ function convertFilter(filter: QuerySchema['filter']) {
             filterValue = new ObjectId(filterValue[queryKey]);
             break;
           case '$eq':
-            if(typeof filterValue[queryKey] == 'string')
-            filterValue =  {
-              "$regex": new RegExp(
-                '^' + filterValue[queryKey] + '$',
-                'i',
-              )
-            };
+            if (typeof filterValue[queryKey] == 'string')
+              filterValue = {
+                "$eq": filterValue[queryKey]
+              };
             break;
           case '$inId':
-            filterValue = {'$in': filterValue[queryKey].map(v=>new ObjectId(v))}
+            filterValue = { '$in': filterValue[queryKey].map(v => new ObjectId(v)) }
             break;
 
           default:
@@ -107,7 +104,10 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
 
   if (req?.filter) {
 
+    console.log('pxxxxxx', req.filter)
     convertFilter(req.filter)
+
+    console.log('xxxxxx', req.filter)
 
     resp = [
       ...resp,
