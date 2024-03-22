@@ -29,8 +29,11 @@ function convertFilter(filter: QuerySchema['filter']) {
             break;
           case '$eq':
             if (typeof filterValue[queryKey] == 'string')
-              filterValue = {
-                "$eq": filterValue[queryKey]
+               filterValue =  {
+                "$regex": new RegExp(
+                  '^' + filterValue[queryKey] + '$',
+                  'i',
+                )
               };
             break;
           case '$inId':
@@ -104,11 +107,7 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
 
   if (req?.filter) {
 
-    console.log('pxxxxxx', req.filter)
     convertFilter(req.filter)
-
-    console.log('xxxxxx', req.filter)
-
     resp = [
       ...resp,
       {
@@ -120,6 +119,8 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
       },
     ]
   }
+
+  console.log(JSON.stringify(resp))
 
   if (req?.sort) {
     try {
