@@ -3,7 +3,7 @@ import { QuerySchema } from "./contract";
 
 function convertLike(value: string) {
   const regex: any = new RegExp(
-    '.*' + value + '.*',
+    '.*' + escapeRegExp(value) + '.*',
     'i',
   );
 
@@ -14,6 +14,9 @@ function convertAndOr(filterValue) {
   for (let orAnd of filterValue) {
     convertFilter(orAnd)
   }
+}
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 function convertFilter(filter: QuerySchema['filter']) {
@@ -29,9 +32,9 @@ function convertFilter(filter: QuerySchema['filter']) {
             break;
           case '$eq':
             if (typeof filterValue[queryKey] == 'string')
-               filterValue =  {
+              filterValue = {
                 "$regex": new RegExp(
-                  '^' + filterValue[queryKey] + '$',
+                  '^' + escapeRegExp(filterValue[queryKey]) + '$',
                   'i',
                 )
               };
