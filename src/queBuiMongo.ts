@@ -62,6 +62,8 @@ function convertFilter(filter: QuerySchema['filter']) {
     }
     filter[k] = filterValue;
   });
+
+  return filter;
 }
 
 function convertRelation(schema, parentName: string, relation: QuerySchema['relations']) {
@@ -99,6 +101,8 @@ function convertPaginated(page: number, perpage: number = 20): [
   ]
 }
 
+export const queBuiMongoConvertFilter = convertFilter;
+
 export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
   let resp: any[] = [];
   const { schema, req } = param;
@@ -122,8 +126,6 @@ export function queBuiMongo(param: { schema: any, req: QuerySchema }) {
       },
     ]
   }
-
-  console.log(JSON.stringify(resp))
 
   if (req?.sort) {
     try {
