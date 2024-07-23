@@ -33,10 +33,8 @@ function convertFilter(filter: QuerySchema['filter']) {
           case '$eq':
             if (typeof filterValue[queryKey] == 'string')
               filterValue = {
-                "$regex": new RegExp(
-                  '^' + escapeRegExp(filterValue[queryKey]) + '$',
-                  'i',
-                )
+                "$regex": '^' + escapeRegExp(filterValue[queryKey]) + '$',
+                "$options": "i"
               };
             break;
           case '$inId':
